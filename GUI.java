@@ -102,7 +102,7 @@
                 this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 this.setSize(new Dimension(1000, 500));
                 this.setVisible(true);
-                this.setTitle("Not OneNote");
+                this.setTitle("Project");
                 this.setLayout(new BorderLayout());
                 this.add(splitGroupPane, BorderLayout.CENTER);
                 this.setJMenuBar(menuBar);

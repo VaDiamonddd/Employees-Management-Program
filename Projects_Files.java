@@ -39,6 +39,8 @@ public class Projects_Files {
             case "project_id desc": return "proj.project_id DESC";
             case "changed_at asc": return "proj.changed_at ASC";
             case "changed_at desc": return "proj.changed_at DESC";
+            case "deadline closer": return "proj.deadline asc";
+            case "deadline farther": return "proj.deadline desc";
             default: return "proj.project_name ASC";
         }
     }
@@ -69,7 +71,7 @@ public class Projects_Files {
                 projectsPanel.repaint();
 
                 // create dropdown list
-                String[] projectsSortingOptions = {"Sort..", "Alphabet A-Z", "Alphabet Z-A", "Creation Date (Older)", "Creation Date (Newer)", "Date of Change (Older)", "Date of Change (Newer)"};
+                String[] projectsSortingOptions = {"Sort..", "Alphabet A-Z", "Alphabet Z-A", "Deadline Closer", "Deadline Farther", "Creation Date (Older)", "Creation Date (Newer)", "Date of Change (Older)", "Date of Change (Newer)"};
                 JComboBox<String> projectsSortingDropdown = new JComboBox<>(projectsSortingOptions);
                 projectsSortingDropdown.addActionListener(new ActionListener() {
                     @Override
@@ -88,6 +90,18 @@ public class Projects_Files {
                             case "Alphabet Z-A":
                                 GUI.subProjectsPanel.removeAll();
                                 getProjectsFilesByAccount(userLogin, accountName, projectsPanel, filesPanel, "project_name desc");
+                                GUI.subProjectsPanel.revalidate();
+                                GUI.subProjectsPanel.repaint();
+                                break;
+                            case "Deadline Closer":
+                                GUI.subProjectsPanel.removeAll();
+                                getProjectsFilesByAccount(userLogin, accountName, projectsPanel, filesPanel, "deadline closer");
+                                GUI.subProjectsPanel.revalidate();
+                                GUI.subProjectsPanel.repaint();
+                                break;
+                            case "Deadline Farther":
+                                GUI.subProjectsPanel.removeAll();
+                                getProjectsFilesByAccount(userLogin, accountName, projectsPanel, filesPanel, "deadline farther");
                                 GUI.subProjectsPanel.revalidate();
                                 GUI.subProjectsPanel.repaint();
                                 break;
@@ -740,10 +754,17 @@ public class Projects_Files {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
                     java.util.Date parsedDate = null;
                     try {
+                        // fetch the entered deadline
                         parsedDate = dateFormat.parse(deadline);
-                        // convert java.util.Date to java.sql.Date
-                        sqlDate = new java.sql.Date(parsedDate.getTime());
-                        isDate = true;
+
+                        // check if this date is not in the past
+                        java.util.Date currentDate = new java.util.Date();
+
+                        if (!parsedDate.before(currentDate)) { // if no, convert it to sql format and switch flag
+                            // convert java.util.Date to java.sql.Date
+                            sqlDate = new java.sql.Date(parsedDate.getTime());
+                            isDate = true;
+                        }
                     } catch (ParseException ex) {
                         JOptionPane.showMessageDialog(null, "Wrong date format! It must be dd.mm.yyyy HH:mm");
                     }
