@@ -73,7 +73,9 @@ public class Login extends JFrame implements ActionListener {
         signUpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) { //we add Login.this to pass the existing Login frame as a parameter
-                Security.createUser(loginField.getText(), Arrays.toString(passwordField.getPassword()), Login.this);
+                char[] passwordChars = passwordField.getPassword();
+                String password = new String(passwordChars);
+                Security.createUser(loginField.getText(), password, Login.this);
             }
         });
 
@@ -90,7 +92,9 @@ public class Login extends JFrame implements ActionListener {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) { //we add Login.this to pass the existing Login frame as a parameter
-                Security.enterUser(loginField.getText(), Arrays.toString(passwordField.getPassword()), Login.this);
+                char[] passwordChars = passwordField.getPassword();
+                String password = new String(passwordChars);
+                Security.enterUser(loginField.getText(), password, Login.this);
             }
         });
 
