@@ -116,7 +116,6 @@ public class Security {
                                 st.executeUpdate("create table projects_junction_" + loginUser + " (account_id int, project_id int, primary key (account_id, project_id),foreign key (account_id) references " + tableNameAcc + "(account_id), foreign key (project_id) references projects_" + loginUser + "(project_id) on delete cascade)");
                             }
 
-
                             //starts the gui window if successful
                             loginFrame.dispose();
                             new GUI(loginUser);

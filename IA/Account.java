@@ -195,7 +195,6 @@ public class Account {
                                             ResultSet rs = fetchAge.executeQuery();
                                             while (rs.next()){
                                                 accountAge = rs.getInt("age");
-                                                System.out.println(String.valueOf(accountAge));
                                             }
                                         } catch (SQLException e1){
                                             e1.printStackTrace();
@@ -235,11 +234,6 @@ public class Account {
                                             ResultSet rs = fetchEmail.executeQuery();
                                             if (rs.next()){
                                                 accountEmail = rs.getString("email");
-                                            }
-                                            if (accountEmail == null){
-                                                System.out.println("Null");
-                                            } else {
-                                                System.out.println(accountEmail);
                                             }
                                         } catch (SQLException e1){
                                             e1.printStackTrace();
