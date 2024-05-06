@@ -7,7 +7,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.List;
-
 public class Security {
     //hashing password method
     private static String getHash(String password, byte[] salt){
@@ -86,13 +85,13 @@ public class Security {
                         if (affectedRows > 0) {
 
                             String tableNameAcc = "acc_" + loginUser;
-                            String sql = "create table " + tableNameAcc + " (account_id int auto_increment primary key, account_name varchar(255) not null, age int, email varchar(50), phone_number varchar(50), workID varchar(50), changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+                            String sql = "create table " + tableNameAcc + " (account_id int auto_increment primary key, account_name varchar(255) not null, age int, email varchar(50), phone_number varchar(50), workID varchar(50), changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null)";
                             try (Statement st = conn.createStatement()) {
                                 st.executeUpdate(sql);
                             }
 
                             String tableNameGr = "gr_" + loginUser;
-                            String sqlGr = "create table " + tableNameGr + " (group_id int auto_increment primary key, name varchar(255) not null unique, changed_at timestamp default current_timestamp)";
+                            String sqlGr = "create table " + tableNameGr + " (group_id int auto_increment primary key, name varchar(255) not null unique, changed_at timestamp default current_timestamp not null)";
                             try (Statement st = conn.createStatement()) {
                                 st.executeUpdate(sqlGr);
                             }
@@ -107,10 +106,10 @@ public class Security {
                             }
                             // create tables for files and projects and junction tables for them
                             try (Statement st = conn.createStatement()) {
-                                st.executeUpdate("create table files_" + loginUser + " (file_id int auto_increment primary key, account_id int, file_name varchar(255) not null, file_path varchar(255) not null, file_type varchar(50), last_change timestamp default current_timestamp, file_creation timestamp, foreign key (account_id) references " + tableNameAcc + "(account_id) on delete cascade)");
+                                st.executeUpdate("create table files_" + loginUser + " (file_id int auto_increment primary key, account_id int, file_name varchar(255) not null, file_path varchar(255) not null, file_type varchar(50), last_change timestamp default current_timestamp not null, file_creation timestamp not null, foreign key (account_id) references " + tableNameAcc + "(account_id) on delete cascade)");
                             }
                             try (Statement st = conn.createStatement()) {
-                                st.executeUpdate("create table projects_" + loginUser + " (project_id int auto_increment primary key, project_name varchar(100) not null, description text, deadline date, changed_at timestamp default current_timestamp);");
+                                st.executeUpdate("create table projects_" + loginUser + " (project_id int auto_increment primary key, project_name varchar(100) not null, description text, deadline date, changed_at timestamp default current_timestamp not null);");
                             }
                             try (Statement st = conn.createStatement()) {
                                 st.executeUpdate("create table projects_junction_" + loginUser + " (account_id int, project_id int, primary key (account_id, project_id),foreign key (account_id) references " + tableNameAcc + "(account_id), foreign key (project_id) references projects_" + loginUser + "(project_id) on delete cascade)");
