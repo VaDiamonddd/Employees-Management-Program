@@ -131,7 +131,7 @@ public class Security {
                 throw new RuntimeException(e);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Login must not be null.");
+            JOptionPane.showMessageDialog(null, "Error. Login must be valid.");
         }
     }
     private static byte[] getSaltByLogin(String login){
@@ -154,7 +154,7 @@ public class Security {
     }
 // enter user (we add Login loginFrame to ensure closing of the Login frame in case everything is successful)
     public static void enterUser(String loginUser, String passwordUser, Login loginFrame) {
-        if (!Objects.equals(loginUser, "")){
+        if (!Objects.equals(loginUser, "") && !Objects.equals(loginUser, "Login")){
             try (Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/mydb", "root", "root")){
                 // check if the userauth table exists
                 try (PreparedStatement checkUserauth = conn.prepareStatement("select * from information_schema.TABLES where TABLE_SCHEMA = 'mydb' and TABLE_NAME = 'userauth'")) {
@@ -169,7 +169,7 @@ public class Security {
                     byte[] salt = getSaltByLogin(loginUser);
                     String hashedPasswordUser = getHash(passwordUser, salt);
                     String hashedPasswordDB = null;
-                    
+
                     // get the password from the db
                     PreparedStatement st = conn.prepareStatement("select password from userauth where Login = ?");
                     st.setString(1, loginUser);
