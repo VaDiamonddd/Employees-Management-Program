@@ -1,11 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.util.Arrays;
-
+import java.awt.event.*;
 public class Login extends JFrame implements ActionListener {
     Login(){
 
@@ -119,7 +114,7 @@ public class Login extends JFrame implements ActionListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(new Dimension(400, 400));
         this.setVisible(true);
-        this.setTitle("Login Form");
+        this.setTitle("Login");
         this.setLayout(new FlowLayout());
         this.add(panel);
         this.setResizable(false);

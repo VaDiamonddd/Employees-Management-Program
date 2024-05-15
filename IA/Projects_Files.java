@@ -1,6 +1,5 @@
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
-import javax.xml.parsers.SAXParser;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
@@ -11,16 +10,12 @@ import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.SortedMap;
 
 public class Projects_Files {
     //private static JTextField nameField;
@@ -773,7 +768,7 @@ public class Projects_Files {
                 }
 
                 // check if user entered name
-                if(!projectName.isEmpty() && !projectName.equals("Name")) {
+                if (!projectName.isEmpty() && !projectName.equals("Name")) {
 
                     // check if date is date, if false, stop
                     if (isDate) {
@@ -872,8 +867,6 @@ public class Projects_Files {
                             JOptionPane.showMessageDialog(null, "No account is chosen. Please try again.");
                         }
                         JOptionPane.showMessageDialog(null, "Project created successfully!");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Wrong date, try again");
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Error. Please re-enter project name.");

@@ -301,6 +301,7 @@ public class Group {
                 public void actionPerformed(ActionEvent e) {
                     GUI.groupsColumn.removeAll();
                     String groupName = nameField.getText().trim(); // value for the text of nameField
+                    // proceed only if group's name is not empty or default
                     if (!groupName.equals("Name") && !groupName.isEmpty()) {
 
                         try (Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/mydb", "root", "root")) {
@@ -345,20 +346,24 @@ public class Group {
                                     Account.connectAccountGroup(groupName, selectedAccount, loginUser);
 
                                     // if the account was previously in Unassigned Groups, it's automatically removed from there
-                                    try(PreparedStatement checkUnassigned = conn.prepareStatement("select group_id from gr_" + loginUser + " where name = 'Unassigned Accounts'")){
+                                    try(PreparedStatement checkUnassigned = conn.prepareStatement("select group_id from gr_" + loginUser +
+                                            " where name = 'Unassigned Accounts'")){
                                         ResultSet rs = checkUnassigned.executeQuery();
                                         if (rs.next()){
                                             int unassignedGroupId = rs.getInt("group_id");
 
                                             // check if the account is in unassigned accounts
-                                            try(PreparedStatement checkAccountInUnassigned = conn.prepareStatement("select count(*) from acc_gr_junction_" + loginUser + " where group_id = ? and account_id = (select account_id from acc_" + loginUser + " where account_name = ?);")){
+                                            try(PreparedStatement checkAccountInUnassigned = conn.prepareStatement("select count(*) from acc_gr_junction_"
+                                                    + loginUser + " where group_id = ? and account_id = (select account_id from acc_" + loginUser +
+                                                    " where account_name = ?);")){
                                                 checkAccountInUnassigned.setInt(1, unassignedGroupId);
                                                 checkAccountInUnassigned.setString(2, selectedAccount);
                                                 ResultSet resultSet = checkAccountInUnassigned.executeQuery();
 
                                                 //if yes, delete from that group
                                                 if(resultSet.next() && resultSet.getInt(1) > 0){
-                                                    try (PreparedStatement removeFromUnassigned = conn.prepareStatement("delete from acc_gr_junction_" + loginUser + " where group_id = ? and account_id = (select account_id from acc_" + loginUser + " where account_name = ?)")){
+                                                    try (PreparedStatement removeFromUnassigned = conn.prepareStatement("delete from acc_gr_junction_" + loginUser +
+                                                            " where group_id = ? and account_id = (select account_id from acc_" + loginUser + " where account_name = ?)")){
                                                         removeFromUnassigned.setInt(1, unassignedGroupId);
                                                         removeFromUnassigned.setString(2, selectedAccount);
                                                         removeFromUnassigned.executeUpdate();
@@ -376,13 +381,12 @@ public class Group {
                                 JOptionPane.showMessageDialog(null, "Group with this name already exists.");
                             }
                         } catch (SQLException e1) {
-                            e1.printStackTrace();
                             JOptionPane.showMessageDialog(null, "Error inserting data");
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "Please enter the name of the group.");
                     }
-                    Group.loadGroupsFromDatabase(loginUser, selectedGrSortingMethod);
+                    loadGroupsFromDatabase(loginUser, selectedGrSortingMethod);
                     JOptionPane.showMessageDialog(null, "Group created successfully.");
                 }
             });
@@ -397,7 +401,6 @@ public class Group {
             frame.setPreferredSize(new Dimension(300, 350));
             frame.pack();
             frame.setLocationRelativeTo(null);
-            Group.loadGroupsFromDatabase(loginUser, selectedGrSortingMethod);
         });
     }
     public static void changeGroup(String loginUser, String certainGroupName, JButton currentGroupButton){
@@ -513,12 +516,14 @@ public class Group {
                                     int selectedAccountID = rs.getInt(1);
 
                                     // check if selected account was in unassigned groups.
-                                    PreparedStatement countUnassigned = conn.prepareStatement("select count(*) from acc_gr_junction_" + loginUser + " where account_id = ? and group_id = ?");
+                                    PreparedStatement countUnassigned = conn.prepareStatement("select count(*) from acc_gr_junction_" + loginUser
+                                            + " where account_id = ? and group_id = ?");
                                     countUnassigned.setInt(1, selectedAccountID);
                                     countUnassigned.setInt(2, 1); // 1 - id of unassigned accounts group
                                     ResultSet rs1 = countUnassigned.executeQuery();
                                     if (rs1.next() && rs1.getInt(1) > 0){ //
-                                        PreparedStatement deleteFromUnassigned = conn.prepareStatement("delete from acc_gr_junction_" + loginUser + " where account_id = ? and group_id = ?");
+                                        PreparedStatement deleteFromUnassigned = conn.prepareStatement("delete from acc_gr_junction_" + loginUser
+                                                + " where account_id = ? and group_id = ?");
                                         deleteFromUnassigned.setInt(1, selectedAccountID);
                                         deleteFromUnassigned.setInt(2, 1);
                                         deleteFromUnassigned.executeUpdate();
