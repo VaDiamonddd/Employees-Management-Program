@@ -162,24 +162,33 @@ public class Group {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         // confirmation window
-                                        int response = JOptionPane.showConfirmDialog(null, "Are you sure that you want to delete the group? All the accounts will be forcefully moved to 'Unassigned Accounts'.", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                                        int response = JOptionPane.showConfirmDialog(null, "Are you sure that you want to delete the group?" +
+                                                " Certain accounts will be forcefully moved to 'Unassigned Accounts'.", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                                         if (response == JOptionPane.YES_OPTION){
                                             try (Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/mydb", "root", "root")){
                                                 // get ids of all accounts assigned to deleted group
-                                                PreparedStatement fetchMovedAccountsIDs = conn.prepareStatement("select account_id from acc_gr_junction_" + loginUser + " where group_id = (select group_id from gr_" + loginUser + " where name = ?)");
+                                                PreparedStatement fetchMovedAccountsIDs = conn.prepareStatement("select account_id from acc_gr_junction_" + loginUser
+                                                        + " where group_id = (select group_id from gr_" + loginUser + " where name = ?)");
                                                 fetchMovedAccountsIDs.setString(1, groupName);
                                                 ResultSet rs = fetchMovedAccountsIDs.executeQuery();
                                                 while (rs.next()){
                                                     int movedAccountID = rs.getInt(1);
 
-                                                    // assign the IDs to unassigned accounts
-                                                    PreparedStatement moveToUnassignedAccounts = conn.prepareStatement("insert into acc_gr_junction_" + loginUser + " values (1, ?)");
-                                                    moveToUnassignedAccounts.setInt(1, movedAccountID);
-                                                    moveToUnassignedAccounts.executeUpdate();
-
+                                                    // if the account is assigned to only the deleted group, move to the unassigned
+                                                    PreparedStatement countAssignedGroups = conn.prepareStatement("select count(*) from acc_gr_junction_" + loginUser + " where account_id = ?");
+                                                    countAssignedGroups.setInt(1, movedAccountID);
+                                                    ResultSet resultSet = countAssignedGroups.executeQuery();
+                                                    if (resultSet.next() && resultSet.getInt(1) == 1){
+                                                        // assign the moved account to unassigned accounts
+                                                        PreparedStatement moveToUnassignedAccounts = conn.prepareStatement("insert into acc_gr_junction_" + loginUser + " values (1, ?)");
+                                                        moveToUnassignedAccounts.setInt(1, movedAccountID);
+                                                        moveToUnassignedAccounts.executeUpdate();
+                                                    }
                                                     // delete existing connections
-                                                    PreparedStatement deleteExistingConnections = conn.prepareStatement("delete from acc_gr_junction_" + loginUser + " where group_id = (select group_id from gr_" + loginUser + " where name = ?)");
+                                                    PreparedStatement deleteExistingConnections = conn.prepareStatement("delete from acc_gr_junction_" + loginUser
+                                                            + " where group_id = (select group_id from gr_" + loginUser + " where name = ?) and account_id = ?");
                                                     deleteExistingConnections.setString(1, groupName);
+                                                    deleteExistingConnections.setInt(2, movedAccountID);
                                                     deleteExistingConnections.executeUpdate();
                                                 }
                                                 // delete the group itself

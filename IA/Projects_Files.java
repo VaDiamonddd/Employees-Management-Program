@@ -680,7 +680,8 @@ public class Projects_Files {
             while (rs.next()){
                 accountNames.add(rs.getString("account_name"));
             }
-            PreparedStatement fetchGroupNames = conn.prepareStatement("select distinct name from gr_" + userLogin + " gr inner join acc_gr_junction_" + userLogin + " gr_j on gr.group_id = gr_j.group_id"); // select only ones that are not empty
+            PreparedStatement fetchGroupNames = conn.prepareStatement("select distinct name from gr_" + userLogin + " gr inner join acc_gr_junction_"
+                    + userLogin + " gr_j on gr.group_id = gr_j.group_id"); // select only ones that are not empty
             ResultSet rs1 = fetchGroupNames.executeQuery();
             while (rs1.next()){
                 groupNames.add(rs1.getString("name"));
